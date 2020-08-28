@@ -1,7 +1,6 @@
 {
   "name": "heic2jpeg-app",
   "version": "0.1.0",
-  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,5 +10,10 @@
     "next": "9.5.2",
     "react": "16.13.1",
     "react-dom": "16.13.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.6.1",
+    "@types/react": "^16.9.48",
+    "typescript": "^4.0.2"
   }
 }
