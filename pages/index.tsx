@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  CircularProgress,
 } from '@material-ui/core'
 import { useDropzone } from 'react-dropzone'
 import { makeStyles, createStyles } from '@material-ui/core/styles'
@@ -165,6 +166,8 @@ export default function Index() {
 
   const [showErrors, setShowErrors] = useState(false)
 
+  const [generating, setGenerating] = useState(false)
+
   useEffect(() => {
     ;(async () => {
       const heic2any = (await import('heic2any')).default
@@ -193,6 +196,7 @@ export default function Index() {
   }, [acceptedFiles, setFiles])
 
   const download = useCallback(async () => {
+    setGenerating(true)
     const JSZip = (await import('jszip')).default
 
     const zip = new JSZip()
@@ -202,7 +206,10 @@ export default function Index() {
     const blob = await zip.generateAsync({ type: 'blob' })
     const url = URL.createObjectURL(blob)
     console.log(url)
-  }, [files])
+
+    setGenerating(false)
+    setFiles([])
+  }, [files, setGenerating, setFiles])
 
   return (
     <Box height="100vh" display="flex" flexDirection="column">
@@ -390,7 +397,8 @@ export default function Index() {
               variant="contained"
               color="secondary"
               disabled={files.length === 0 || loading}
-              onClick={download}
+              onClick={!generating ? download : undefined}
+              startIcon={generating && <CircularProgress size={24} />}
             >
               DOWNLOAD FILES
             </Button>
