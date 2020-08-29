@@ -66,11 +66,7 @@ const useStyles = makeStyles((theme) =>
       fontSize: '6rem',
     },
     icon: {
-      // color: theme.palette.common.white,
       fontSize: '10rem',
-    },
-    drop: {
-      // color: theme.palette.common.white,
     },
     root: {
       display: 'flex',
@@ -196,7 +192,7 @@ const DropBox = ({
       {inputProps && <input {...inputProps} />}
       <MoveToInboxOutlined color="inherit" className={classes.icon} />
       <Box flex={1} display="flex" alignItems="center" justifyContent="center">
-        <Typography variant="h5" color="inherit" className={classes.drop}>
+        <Typography variant="h5" color="inherit">
           {isDragActive ? (
             <>Drop files to convert</>
           ) : (
