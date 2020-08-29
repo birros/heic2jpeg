@@ -221,7 +221,6 @@ export default function Index() {
     getInputProps,
   } = useDropzone({
     multiple: true,
-    accept: 'image/heic',
   })
 
   const {
