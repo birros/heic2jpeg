@@ -2,6 +2,7 @@ import NextI18Next from 'next-i18next'
 import path from 'path'
 import NextConfig from 'next/config'
 
+const isProd = process.env.NODE_ENV === 'production'
 const { localeSubpaths } = NextConfig().publicRuntimeConfig
 
 const {
@@ -18,7 +19,11 @@ const {
   defaultLanguage: 'en',
   otherLanguages: ['fr'],
   localeSubpaths,
-  localePath: path.resolve('./public/static/locales'),
+  localePath: path.resolve(
+    isProd && process.browser
+      ? './heic2jpeg/public/static/locales'
+      : './public/static/locales'
+  ),
 })
 
 export {
