@@ -19,7 +19,11 @@ import {
   CircularProgress,
   useTheme,
 } from '@material-ui/core'
-import { useDropzone } from 'react-dropzone'
+import {
+  useDropzone,
+  DropzoneInputProps,
+  DropzoneRootProps,
+} from 'react-dropzone'
 import { makeStyles, createStyles } from '@material-ui/core/styles'
 import {
   MoveToInboxOutlined,
@@ -29,6 +33,7 @@ import {
 import { Skeleton, Alert } from '@material-ui/lab'
 import { useWindowSize } from 'react-use'
 import { v4 } from 'uuid'
+import grey from '@material-ui/core/colors/grey'
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -61,11 +66,11 @@ const useStyles = makeStyles((theme) =>
       fontSize: '6rem',
     },
     icon: {
-      color: theme.palette.common.white,
+      // color: theme.palette.common.white,
       fontSize: '10rem',
     },
     drop: {
-      color: theme.palette.common.white,
+      // color: theme.palette.common.white,
     },
     root: {
       display: 'flex',
@@ -144,16 +149,59 @@ const useStyles = makeStyles((theme) =>
     },
     backdropBox: {
       borderWidth: 3,
-      borderColor: '#fff',
+      borderColor: 'inherit',
       borderStyle: 'dashed',
       borderRadius: theme.shape.borderRadius,
       paddingLeft: theme.spacing(8),
       paddingRight: theme.spacing(8),
       paddingTop: theme.spacing(6),
       paddingBottom: theme.spacing(6),
+      cursor: 'pointer',
+      maxWidth: 350,
+      width: '100%',
+      maxHeight: 327,
+      height: '100%',
     },
   })
 )
+
+const DropBox = ({
+  inputProps,
+  rootProps,
+  isDragActive,
+  variant,
+}: {
+  inputProps?: DropzoneInputProps
+  rootProps?: DropzoneRootProps
+  isDragActive: boolean
+  variant?: 'light' | 'dark'
+}) => {
+  const classes = useStyles()
+  return (
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      textAlign="center"
+      className={classes.backdropBox}
+      color="inherit"
+      style={{ color: variant === 'dark' ? grey[400] : '#fff' }}
+      {...rootProps}
+    >
+      {inputProps && <input {...inputProps} />}
+      <MoveToInboxOutlined color="inherit" className={classes.icon} />
+      <Box flex={1} display="flex" alignItems="center" justifyContent="center">
+        <Typography variant="h5" color="inherit" className={classes.drop}>
+          {isDragActive ? (
+            <>Drop files to convert</>
+          ) : (
+            <>Click or drag files to this area to convert</>
+          )}
+        </Typography>
+      </Box>
+    </Box>
+  )
+}
 
 export default function Index() {
   const { width } = useWindowSize(500)
@@ -197,10 +245,12 @@ export default function Index() {
 
   const [errors, setErrors] = useState<string[]>([])
 
-  const loading = useMemo(
-    () => files.filter((f) => f.url === undefined).length > 0,
+  const convertingCount = useMemo(
+    () => files.filter((f) => f.url === undefined).length,
     [files]
   )
+
+  const converting = useMemo(() => convertingCount > 0, [convertingCount])
 
   const [showErrors, setShowErrors] = useState(false)
 
@@ -294,39 +344,12 @@ export default function Index() {
             visibility={files.length > 0 ? 'hidden' : undefined}
             maxHeight={files.length > 0 ? 0 : undefined}
           >
-            <Box className={classes.upload} {...rootProps}>
-              <Box p={2} className={classes.uploadInner}>
-                <Box
-                  className={classes.inner}
-                  p={2}
-                  height="100%"
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="center"
-                  textAlign="center"
-                >
-                  <input {...getInputProps()} />
-                  <Box
-                    flex={1}
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <MoveToInboxOutlined
-                      fontSize="large"
-                      className={classes.firstIcon}
-                    />
-                  </Box>
-                  <Typography color="textSecondary">
-                    {isDragActive ? (
-                      <>Drop files to convert</>
-                    ) : (
-                      <>Click or drag files to this area to convert</>
-                    )}
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
+            <DropBox
+              isDragActive={isDragActive}
+              inputProps={getInputProps()}
+              rootProps={rootProps}
+              variant="dark"
+            />
           </Box>
 
           <Box
@@ -345,18 +368,7 @@ export default function Index() {
             className={classes.backdrop}
             open={isDragActive && files.length > 0}
           >
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              textAlign="center"
-              className={classes.backdropBox}
-            >
-              <MoveToInboxOutlined className={classes.icon} />
-              <Typography variant="h5" color="inherit" className={classes.drop}>
-                Drop files to convert
-              </Typography>
-            </Box>
+            <DropBox isDragActive={true} variant="light" />
           </Backdrop>
         </Box>
       </RootRef>
@@ -442,18 +454,39 @@ export default function Index() {
             <Box />
           )}
           <Box display="flex" alignItems="center">
-            {!loading && files.length > 0 && (
-              <Box mr={2}>
-                <Typography>{files.length} files converted</Typography>
+            {(converting || files.length > 0 || generating) && (
+              <Box mr={2} display="flex" alignItems="center">
+                {(generating || converting) && (
+                  <Box
+                    mr={1}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <CircularProgress size={16} />
+                  </Box>
+                )}
+                <Typography>
+                  {generating ? (
+                    <>Generating zip file...</>
+                  ) : converting ? (
+                    <>
+                      Converting {convertingCount}/{files.length} files...
+                    </>
+                  ) : (
+                    <>
+                      {files.length} file{files.length > 1 && 's'} converted
+                    </>
+                  )}
+                </Typography>
               </Box>
             )}
 
             <Button
               variant="contained"
               color="primary"
-              disabled={files.length === 0 || loading}
-              onClick={!generating ? download : undefined}
-              startIcon={generating && <CircularProgress size={24} />}
+              disabled={files.length === 0 || converting || generating}
+              onClick={download}
             >
               DOWNLOAD FILES
             </Button>
