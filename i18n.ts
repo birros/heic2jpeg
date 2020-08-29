@@ -21,7 +21,7 @@ const {
   localeSubpaths,
   localePath: path.resolve(
     isProd && process.browser
-      ? './heic2jpeg/public/static/locales'
+      ? './heic2jpeg/static/locales'
       : './public/static/locales'
   ),
 })
