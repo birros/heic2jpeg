@@ -267,10 +267,15 @@ export default function Index() {
     ;(async () => {
       const heic2any = (await import('heic2any')).default
 
+      const objects: { id: string; file: File }[] = []
+
       for (const file of acceptedFiles) {
         const id = v4()
-
         setFiles((files) => [...files, { id, name: file.name }])
+        objects.push({ id, file })
+      }
+
+      for (const { id, file } of objects) {
         try {
           const result = await heic2any({
             blob: file,
