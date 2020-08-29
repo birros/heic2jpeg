@@ -170,11 +170,13 @@ const DropBox = ({
   inputProps,
   rootProps,
   isDragActive,
+  isDragReject,
   variant,
 }: {
   inputProps?: DropzoneInputProps
   rootProps?: DropzoneRootProps
   isDragActive: boolean
+  isDragReject: boolean
   variant?: 'light' | 'dark'
 }) => {
   const classes = useStyles()
@@ -193,7 +195,9 @@ const DropBox = ({
       <MoveToInboxOutlined color="inherit" className={classes.icon} />
       <Box flex={1} display="flex" alignItems="center" justifyContent="center">
         <Typography variant="h5" color="inherit">
-          {isDragActive ? (
+          {isDragReject ? (
+            <>Some files will be rejected</>
+          ) : isDragActive ? (
             <>Drop files to convert</>
           ) : (
             <>Click or drag files to this area to convert</>
@@ -211,6 +215,7 @@ export default function Index() {
   const {
     acceptedFiles,
     isDragActive,
+    isDragReject,
     getRootProps,
     getInputProps,
   } = useDropzone({
@@ -356,6 +361,7 @@ export default function Index() {
           >
             <DropBox
               isDragActive={isDragActive}
+              isDragReject={isDragReject}
               inputProps={getInputProps()}
               rootProps={rootProps}
               variant="dark"
@@ -378,7 +384,11 @@ export default function Index() {
             className={classes.backdrop}
             open={isDragActive && files.length > 0}
           >
-            <DropBox isDragActive={true} variant="light" />
+            <DropBox
+              isDragActive={true}
+              isDragReject={isDragReject}
+              variant="light"
+            />
           </Backdrop>
         </Box>
       </RootRef>
