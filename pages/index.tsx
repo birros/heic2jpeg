@@ -17,6 +17,7 @@ import {
   DialogContent,
   DialogActions,
   CircularProgress,
+  useTheme,
 } from '@material-ui/core'
 import { useDropzone } from 'react-dropzone'
 import { makeStyles, createStyles } from '@material-ui/core/styles'
@@ -35,7 +36,7 @@ const useStyles = makeStyles((theme) =>
       zIndex: theme.zIndex.appBar - 1,
     },
     inner: {
-      borderWidth: 1,
+      borderWidth: 3,
       borderColor: theme.palette.grey[400],
       borderStyle: 'dashed',
       borderRadius: theme.shape.borderRadius,
@@ -97,13 +98,40 @@ const useStyles = makeStyles((theme) =>
     },
     fab: {
       position: 'fixed',
-      bottom: theme.spacing(10),
       right: theme.spacing(2),
+      ...(theme.props.MuiToolbar && theme.props.MuiToolbar.variant === 'dense'
+        ? {
+            bottom: theme.spacing(7.5),
+          }
+        : {
+            bottom: theme.spacing(9.5),
+          }),
     },
     alert: {
       paddingTop: 0,
       paddingBottom: 0,
       paddingLeft: 12,
+      ...(theme.props.MuiToolbar && theme.props.MuiToolbar.variant === 'dense'
+        ? {
+            maxHeight: 31,
+            display: 'flex',
+            alignItems: 'center',
+          }
+        : undefined),
+    },
+    alertIcon: {
+      ...(theme.props.MuiToolbar && theme.props.MuiToolbar.variant === 'dense'
+        ? {
+            padding: 0,
+          }
+        : undefined),
+    },
+    alertMessage: {
+      ...(theme.props.MuiToolbar && theme.props.MuiToolbar.variant === 'dense'
+        ? {
+            padding: 0,
+          }
+        : undefined),
     },
     bottomToolbar: {
       justifyContent: 'space-between',
@@ -113,6 +141,16 @@ const useStyles = makeStyles((theme) =>
       right: theme.spacing(1),
       top: theme.spacing(1),
       color: theme.palette.grey[500],
+    },
+    backdropBox: {
+      borderWidth: 3,
+      borderColor: '#fff',
+      borderStyle: 'dashed',
+      borderRadius: theme.shape.borderRadius,
+      paddingLeft: theme.spacing(8),
+      paddingRight: theme.spacing(8),
+      paddingTop: theme.spacing(6),
+      paddingBottom: theme.spacing(6),
     },
   })
 )
@@ -211,6 +249,8 @@ export default function Index() {
     setFiles([])
   }, [files, setGenerating, setFiles])
 
+  const theme = useTheme()
+
   return (
     <Box height="100vh" display="flex" flexDirection="column">
       <AppBar position="relative">
@@ -225,8 +265,8 @@ export default function Index() {
         </Toolbar>
       </AppBar>
       <RootRef rootRef={ref}>
-        <Box p={2} flex={1} {...dropProps}>
-          {files.length > 0 ? (
+        <Box p={2} flex={1} overflow="auto" {...dropProps}>
+          {files.length > 0 && (
             <GridList cellHeight={160} cols={cols} spacing={10}>
               {files.map((file) => (
                 <GridListTile key={file.id} cols={1}>
@@ -244,51 +284,58 @@ export default function Index() {
                 </GridListTile>
               ))}
             </GridList>
-          ) : (
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              height="100%"
-            >
-              <Box className={classes.upload} {...rootProps}>
-                <Box p={2} className={classes.uploadInner}>
+          )}
+
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            height="100%"
+            visibility={files.length > 0 ? 'hidden' : undefined}
+            maxHeight={files.length > 0 ? 0 : undefined}
+          >
+            <Box className={classes.upload} {...rootProps}>
+              <Box p={2} className={classes.uploadInner}>
+                <Box
+                  className={classes.inner}
+                  p={2}
+                  height="100%"
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  textAlign="center"
+                >
+                  <input {...getInputProps()} />
                   <Box
-                    className={classes.inner}
-                    p={2}
-                    height="100%"
+                    flex={1}
                     display="flex"
-                    flexDirection="column"
                     alignItems="center"
-                    textAlign="center"
+                    justifyContent="center"
                   >
-                    <input {...getInputProps()} />
-                    <Box
-                      flex={1}
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                    >
-                      <MoveToInboxOutlined
-                        fontSize="large"
-                        className={classes.firstIcon}
-                      />
-                    </Box>
-                    <Typography color="textSecondary">
-                      {isDragActive ? (
-                        <>Drop files to convert</>
-                      ) : (
-                        <>Click or drag files to this area to convert</>
-                      )}
-                    </Typography>
+                    <MoveToInboxOutlined
+                      fontSize="large"
+                      className={classes.firstIcon}
+                    />
                   </Box>
+                  <Typography color="textSecondary">
+                    {isDragActive ? (
+                      <>Drop files to convert</>
+                    ) : (
+                      <>Click or drag files to this area to convert</>
+                    )}
+                  </Typography>
                 </Box>
               </Box>
             </Box>
-          )}
+          </Box>
 
-          <Box {...rootProps} className={classes.fab}>
-            <Fab color="secondary">
+          <Box
+            {...rootProps}
+            className={classes.fab}
+            visibility={files.length === 0 ? 'hidden' : undefined}
+            maxHeight={files.length === 0 ? 0 : undefined}
+          >
+            <Fab>
               <input {...getInputProps()} />
               <AddIcon />
             </Fab>
@@ -303,6 +350,7 @@ export default function Index() {
               flexDirection="column"
               alignItems="center"
               textAlign="center"
+              className={classes.backdropBox}
             >
               <MoveToInboxOutlined className={classes.icon} />
               <Typography variant="h5" color="inherit" className={classes.drop}>
@@ -333,20 +381,23 @@ export default function Index() {
         <DialogContent dividers>
           {errors.map((_, index) => (
             <Box key={index} my={2}>
-              <Alert severity="error">{errors[index]}</Alert>
+              <Alert
+                severity="error"
+                variant={theme.palette.type === 'dark' ? 'outlined' : undefined}
+              >
+                {errors[index]}
+              </Alert>
             </Box>
           ))}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowErrors(false)} color="primary">
-            Cancel
-          </Button>
+          <Button onClick={() => setShowErrors(false)}>Cancel</Button>
           <Button
             onClick={() => {
               setErrors([])
               setShowErrors(false)
             }}
-            color="secondary"
+            color="primary"
             variant="contained"
           >
             Clear
@@ -362,6 +413,10 @@ export default function Index() {
               variant="filled"
               severity="error"
               className={classes.alert}
+              classes={{
+                icon: classes.alertIcon,
+                message: classes.alertMessage,
+              }}
               action={
                 <>
                   <Button
@@ -395,7 +450,7 @@ export default function Index() {
 
             <Button
               variant="contained"
-              color="secondary"
+              color="primary"
               disabled={files.length === 0 || loading}
               onClick={!generating ? download : undefined}
               startIcon={generating && <CircularProgress size={24} />}
