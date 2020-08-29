@@ -320,9 +320,9 @@ export default function Index() {
   const [tr, i18n] = useTranslation('common')
 
   useEffect(() => {
-    console.log(i18n.languages)
-    if (i18n.languages.length > 0) {
-      i18n.changeLanguage(i18n.languages[0])
+    const lang = navigator.language.split('-')[0]
+    if (lang === 'fr') {
+      i18n.changeLanguage(lang)
     }
   }, [i18n])
 
