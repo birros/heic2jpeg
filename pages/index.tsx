@@ -472,7 +472,8 @@ export default function Index() {
                     <>Generating zip file...</>
                   ) : converting ? (
                     <>
-                      Converting {convertingCount}/{files.length} files...
+                      Converting {convertingCount}/{files.length}
+                      file{files.length > 1 && 's'}...
                     </>
                   ) : (
                     <>
