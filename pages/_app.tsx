@@ -1,12 +1,13 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import App from 'next/app'
 import Head from 'next/head'
-import type { AppProps } from 'next/app'
+import type { AppProps, AppContext } from 'next/app'
 import { ThemeProvider } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import theme from '../src/theme'
+import { appWithTranslation } from '../i18n'
 
-export default function MyApp(props: AppProps) {
+const MyApp = (props: AppProps) => {
   const { Component, pageProps } = props
 
   React.useEffect(() => {
@@ -33,7 +34,8 @@ export default function MyApp(props: AppProps) {
   )
 }
 
-MyApp.propTypes = {
-  Component: PropTypes.elementType.isRequired,
-  pageProps: PropTypes.object.isRequired,
-}
+MyApp.getInitialProps = async (appContext: AppContext) => ({
+  ...(await App.getInitialProps(appContext)),
+})
+
+export default appWithTranslation(MyApp)

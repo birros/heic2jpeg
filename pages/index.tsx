@@ -34,6 +34,7 @@ import { Skeleton, Alert } from '@material-ui/lab'
 import { useWindowSize } from 'react-use'
 import { v4 } from 'uuid'
 import grey from '@material-ui/core/colors/grey'
+import { useTranslation } from '../i18n'
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -153,7 +154,7 @@ const useStyles = makeStyles((theme) =>
       paddingTop: theme.spacing(6),
       paddingBottom: theme.spacing(6),
       cursor: 'pointer',
-      maxWidth: 350,
+      maxWidth: 380,
       width: '100%',
       maxHeight: 327,
       height: '100%',
@@ -180,6 +181,8 @@ const DropBox = ({
   variant?: 'light' | 'dark'
 }) => {
   const classes = useStyles()
+  const [tr] = useTranslation('common')
+
   return (
     <Box
       display="flex"
@@ -195,13 +198,11 @@ const DropBox = ({
       <MoveToInboxOutlined color="inherit" className={classes.icon} />
       <Box flex={1} display="flex" alignItems="center" justifyContent="center">
         <Typography variant="h5" color="inherit">
-          {isDragReject ? (
-            <>Some files will be rejected</>
-          ) : isDragActive ? (
-            <>Drop files to convert</>
-          ) : (
-            <>Click or drag files to this area to convert</>
-          )}
+          {isDragReject
+            ? tr('reject')
+            : isDragActive
+            ? tr('drop')
+            : tr('infos')}
         </Typography>
       </Box>
     </Box>
@@ -316,6 +317,15 @@ export default function Index() {
 
   const theme = useTheme()
 
+  const [tr, i18n] = useTranslation('common')
+
+  useEffect(() => {
+    console.log(i18n.languages)
+    if (i18n.languages.length > 0) {
+      i18n.changeLanguage(i18n.languages[0])
+    }
+  }, [i18n])
+
   return (
     <Box height="100vh" display="flex" flexDirection="column">
       <AppBar position="relative">
@@ -401,7 +411,7 @@ export default function Index() {
       >
         <DialogTitle>
           <Typography component="span" variant="h6">
-            {errors.length} Error{errors.length > 1 && 's'}
+            {tr('error', { count: errors.length })}
           </Typography>
           <IconButton
             onClick={() => setShowErrors(false)}
@@ -423,7 +433,7 @@ export default function Index() {
           ))}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowErrors(false)}>Cancel</Button>
+          <Button onClick={() => setShowErrors(false)}>{tr('cancel')}</Button>
           <Button
             onClick={() => {
               setErrors([])
@@ -432,7 +442,7 @@ export default function Index() {
             color="primary"
             variant="contained"
           >
-            Clear
+            {tr('clear')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -456,7 +466,7 @@ export default function Index() {
                     size="small"
                     onClick={() => setShowErrors(true)}
                   >
-                    SHOW
+                    {tr('show')}
                   </Button>
                   <IconButton
                     color="inherit"
@@ -468,7 +478,7 @@ export default function Index() {
                 </>
               }
             >
-              {errors.length} Error{errors.length > 1 && 's'} have occurred
+              {tr('errors-occurred', { count: errors.length })}
             </Alert>
           ) : (
             <Box />
@@ -487,18 +497,15 @@ export default function Index() {
                   </Box>
                 )}
                 <Typography>
-                  {generating ? (
-                    <>Generating zip file...</>
-                  ) : converting ? (
-                    <>
-                      Converting {convertingCount}/{files.length}
-                      file{files.length > 1 && 's'}...
-                    </>
-                  ) : (
-                    <>
-                      {files.length} file{files.length > 1 && 's'} converted
-                    </>
-                  )}
+                  {generating
+                    ? tr('generating')
+                    : converting
+                    ? tr('converting', {
+                        count: convertingCount,
+                      })
+                    : tr('converted', {
+                        count: files.length,
+                      })}
                 </Typography>
               </Box>
             )}
@@ -512,7 +519,7 @@ export default function Index() {
                 disabled: classes.buttonDisabled,
               }}
             >
-              DOWNLOAD FILES
+              {tr('download-files')}
             </Button>
           </Box>
         </Toolbar>
@@ -520,3 +527,7 @@ export default function Index() {
     </Box>
   )
 }
+
+Index.getInitialProps = async () => ({
+  namespacesRequired: ['common'],
+})
