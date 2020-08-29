@@ -215,6 +215,7 @@ export default function Index() {
     getInputProps,
   } = useDropzone({
     multiple: true,
+    accept: 'image/heic',
   })
 
   const {
@@ -269,7 +270,7 @@ export default function Index() {
           const result = await heic2any({
             blob: file,
             toType: 'image/jpeg',
-            quality: 0.5,
+            quality: 0.8,
           })
           const blob = Array.isArray(result) ? result[0] : result
           const url = URL.createObjectURL(blob)
@@ -290,11 +291,19 @@ export default function Index() {
 
     const zip = new JSZip()
     files.forEach((file) => {
-      zip.file(file.name, file.blob)
+      zip.file(`images/${file.name.replace(/.heic$/, '.jpeg')}`, file.blob)
     })
     const blob = await zip.generateAsync({ type: 'blob' })
     const url = URL.createObjectURL(blob)
-    console.log(url)
+
+    const a = document.createElement('a')
+    a.setAttribute('download', 'images.zip')
+    a.setAttribute('href', url)
+    a.style.setProperty('display', 'node')
+
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
 
     setGenerating(false)
     setFiles([])
