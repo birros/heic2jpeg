@@ -162,6 +162,11 @@ const useStyles = makeStyles((theme) =>
       maxHeight: 327,
       height: '100%',
     },
+    buttonDisabled: {
+      color: `${grey[400]} !important`,
+      borderWidth: 1,
+      borderStyle: 'solid',
+    },
   })
 )
 
@@ -487,6 +492,9 @@ export default function Index() {
               color="primary"
               disabled={files.length === 0 || converting || generating}
               onClick={download}
+              classes={{
+                disabled: classes.buttonDisabled,
+              }}
             >
               DOWNLOAD FILES
             </Button>
