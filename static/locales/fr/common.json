@@ -1,0 +1,18 @@
+{
+  "download-files": "Télécharger les fichiers",
+  "show": "Afficher",
+  "error": "{{ count }} Erreur",
+  "error_plural": "{{ count }} Erreurs",
+  "errors-occurred": "{{ count }} Erreur est survenue",
+  "errors-occurred_plural": "{{ count }} Erreurs sont survenues",
+  "generating": "Generation du fichier zip...",
+  "converting": "Conversion de {{ count }} fichier...",
+  "converting_plural": "Conversion de {{ count }} fichiers...",
+  "converted": "{{ count }} fichier converti",
+  "converted_plural": "{{ count }} fichiers convertis",
+  "cancel": "Annuler",
+  "clear": "Effacer",
+  "reject": "Certains fichiers ne seront pas convertis",
+  "drop": "Déposez les fichiers pour les convertir",
+  "infos": "Cliquez ou déposez des fichiers sur cettte zone pour les convertir"
+}
