@@ -267,7 +267,7 @@ export default function Index() {
     ;(async () => {
       const heic2any = (await import('heic2any')).default
 
-      acceptedFiles.forEach(async (file) => {
+      for (const file of acceptedFiles) {
         const id = v4()
 
         setFiles((files) => [...files, { id, name: file.name }])
@@ -286,7 +286,7 @@ export default function Index() {
           setFiles((files) => files.filter((f) => f.id !== id))
           setErrors((errors) => [...errors, file.name])
         }
-      })
+      }
     })()
   }, [acceptedFiles, setFiles])
 
