@@ -34,7 +34,7 @@ import { Skeleton, Alert } from '@material-ui/lab'
 import { useWindowSize } from 'react-use'
 import { v4 } from 'uuid'
 import grey from '@material-ui/core/colors/grey'
-import { useTranslation } from '../i18n'
+import { useTranslation } from 'react-i18next'
 
 const useStyles = makeStyles((theme) =>
   createStyles({
